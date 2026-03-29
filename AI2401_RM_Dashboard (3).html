@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI2401 Revenue Management Dashboard — Mumbai to Bangalore</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bl:#1B4F8A;--bl2:#2E7DD6;--blt:#EEF4FB;--tx:#1a1a2e;--mu:#6b7280;--br:#e5e7eb;--bg:#f4f6f9;--wh:#fff;--gn:#059669;--glt:#ecfdf5;--am:#d97706;--alt:#fffbeb;--rd:#dc2626;--rlt:#fef2f2}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;min-height:100vh}
+.hdr{background:var(--bl);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:16px}
+.hdr-ico{background:rgba(255,255,255,.18);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.hdr h1{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.hdr p{font-size:11px;opacity:.75;margin-top:2px}
+.hdr-badges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.bdg{background:rgba(255,255,255,.2);border-radius:4px;padding:3px 9px;font-size:10px;font-weight:600;white-space:nowrap}
+.tabs{background:var(--wh);border-bottom:1px solid var(--br);padding:0 20px;display:flex;overflow-x:auto}
+.tab{padding:11px 14px;font-size:12px;font-weight:600;color:var(--mu);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab.on{color:var(--bl);border-bottom-color:var(--bl)}
+.tab:hover:not(.on){background:var(--blt);color:var(--bl)}
+.pane{display:none;padding:20px}
+.pane.on{display:block}
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.met{background:var(--wh);border:1px solid var(--br);border-radius:8px;padding:14px 16px}
+.ml{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.mv{font-size:23px;font-weight:800;color:var(--bl);line-height:1}
+.ms{font-size:10px;color:var(--mu);margin-top:3px}
+.met.gn .mv{color:var(--gn)}
+.met.am .mv{color:var(--am)}
+.met.rd .mv{color:var(--rd)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--wh);border:1px solid var(--br);border-radius:8px;padding:16px}
+.ct{font-size:11px;font-weight:700;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.4px}
+.ct::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bl);flex-shrink:0}
+.cw{position:relative}
+.h280{height:280px}
+.h260{height:260px}
+.h240{height:240px}
+.h320{height:320px}
+.h360{height:360px}
+.h200{height:200px}
+table.dt{width:100%;border-collapse:collapse;font-size:11px}
+table.dt th{background:#f1f5fb;padding:7px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--br)}
+table.dt td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:#fafbfe}
+.b{display:inline-block;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700}
+.bb{background:var(--blt);color:var(--bl)}
+.bg{background:var(--glt);color:var(--gn)}
+.ba{background:var(--alt);color:var(--am)}
+.br{background:var(--rlt);color:var(--rd)}
+.sl-g{margin:8px 0}
+.sl-g .sl-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sl-g label{font-size:11px;color:var(--mu);min-width:160px}
+.sl-g input[type=range]{flex:1;accent-color:var(--bl)}
+.sl-g .sv{font-size:11px;font-weight:700;color:var(--bl);min-width:70px;text-align:right}
+.infobox{background:var(--blt);border-left:3px solid var(--bl);border-radius:0 6px 6px 0;padding:10px 13px;margin:10px 0;font-size:11px;line-height:1.75;color:#2c3e50}
+.infobox strong{color:var(--bl)}
+.big-res{background:var(--bl);color:#fff;border-radius:8px;padding:16px;text-align:center;margin:10px 0}
+.big-res .num{font-size:34px;font-weight:900;line-height:1}
+.big-res .lbl{font-size:10px;opacity:.8;margin-top:4px}
+.nb-row{display:flex;align-items:center;gap:7px;margin:3px 0}
+.nb-lbl{font-size:10px;color:var(--mu);width:95px;text-align:right;flex-shrink:0}
+.nb-trk{flex:1;background:#eee;border-radius:2px;height:15px;overflow:hidden}
+.nb-fill{height:100%;border-radius:2px;display:flex;align-items:center;padding:0 5px;transition:width .4s ease}
+.nb-fill span{font-size:9px;font-weight:700;color:#fff;white-space:nowrap}
+.nb-val{font-size:10px;color:var(--tx);width:30px;flex-shrink:0}
+.formula{background:#0f172a;color:#e2e8f0;border-radius:6px;padding:12px;font-family:'Courier New',monospace;font-size:11px;line-height:1.9;margin:8px 0}
+.formula .cm{color:#7c9ab8}.formula .kw{color:#fbbf24}.formula .vl{color:#86efac}.formula .op{color:#93c5fd}
+.section-title{font-size:12px;font-weight:700;color:var(--tx);margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--br)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-ico">✈</div>
+  <div>
+    <h1>AI2401 — Mumbai to Bangalore, Mar 17 2026</h1>
+    <p>Revenue Management Dashboard · Pricing & Capacity Optimisation · IIMV Operations Management</p>
+  </div>
+  <div class="hdr-badges">
+    <span class="bdg">Airbus A320 Neo</span>
+    <span class="bdg">164 Seats</span>
+    <span class="bdg">Feb 15 – Mar 17</span>
+    <span class="bdg">30-Day Tracking</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab(0)">📈 Price Trajectory</button>
+  <button class="tab" onclick="showTab(1)">🎯 EMSR-b Allocation</button>
+  <button class="tab" onclick="showTab(2)">🔒 Overbooking Model</button>
+  <button class="tab" onclick="showTab(3)">💰 Revenue Simulation</button>
+</div>
+
+<!-- TAB 1: PRICE TRAJECTORY -->
+<div class="pane on" id="p0">
+  <div class="r2">
+    <div class="card">
+      <div class="ct">Economy — Linear Price Trajectory (Feb 15 – Mar 16, 2026)</div>
+      <div class="cw h280"><canvas id="c_price_eco"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Premium Economy — Linear Price Trajectory (Feb 15 – Mar 16, 2026)</div>
+      <div class="cw h280"><canvas id="c_price_pe"></canvas></div>
+    </div>
+  </div>
+  <div class="r2">
+    <div class="card">
+      <div class="ct">Fare Schedule — Economy &amp; Premium Economy</div>
+      <table class="dt">
+        <tr><th>Bucket</th><th>Date Range</th><th>DTD</th><th>Economy (INR)</th><th>Prem. Eco (INR)</th><th>% Change (Eco)</th></tr>
+        <tr><td><span class="b bb">B1</span></td><td>Feb 15–19</td><td>30–26</td><td><strong>₹3,877</strong></td><td>₹5,622</td><td>—</td></tr>
+        <tr><td><span class="b bb">B2</span></td><td>Feb 20–23</td><td>25–22</td><td><strong>₹4,155</strong></td><td>₹6,025</td><td><span class="b ba">+7.2%</span></td></tr>
+        <tr><td><span class="b bb">B3</span></td><td>Feb 24–27</td><td>21–18</td><td><strong>₹4,552</strong></td><td>₹6,600</td><td><span class="b ba">+9.6%</span></td></tr>
+        <tr><td><span class="b bb">B4</span></td><td>Feb 28–Mar 2</td><td>17–15</td><td><strong>₹4,847</strong></td><td>₹7,028</td><td><span class="b ba">+6.5%</span></td></tr>
+        <tr><td><span class="b bb">B5</span></td><td>Mar 3–4</td><td>14–13</td><td><strong>₹5,349</strong></td><td>₹7,756</td><td><span class="b ba">+10.4%</span></td></tr>
+        <tr><td><span class="b bb">B6</span></td><td>Mar 5–7</td><td>12–10</td><td><strong>₹5,890</strong></td><td>₹8,541</td><td><span class="b ba">+10.1%</span></td></tr>
+        <tr><td><span class="b bg">B7</span></td><td>Mar 8–10</td><td>9–7</td><td><strong>₹6,478</strong></td><td>₹9,393</td><td><span class="b ba">+10.0%</span></td></tr>
+        <tr><td><span class="b bg">B8</span></td><td>Mar 11–13</td><td>6–4</td><td><strong>₹7,500</strong></td><td>₹10,875</td><td><span class="b ba">+15.8%</span></td></tr>
+        <tr><td><span class="b bg">B9</span></td><td>Mar 14</td><td>3</td><td><strong>₹9,200</strong></td><td>₹13,340</td><td><span class="b ba">+22.7%</span></td></tr>
+        <tr><td><span class="b ba">B10</span></td><td>Mar 15</td><td>2</td><td><strong>₹11,500</strong></td><td>₹16,675</td><td><span class="b ba">+25.0%</span></td></tr>
+        <tr><td><span class="b br">B11</span></td><td>Mar 16</td><td>1</td><td><strong>₹13,800</strong></td><td>₹20,010</td><td><span class="b ba">+20.0%</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ct">Day-on-Day Price Change (%)</div>
+      <div class="cw h240"><canvas id="c_accel"></canvas></div>
+      <div class="infobox" style="margin-top:12px">
+        <strong>Observation:</strong> Price acceleration increases sharply inside D-7. The critical zone (D-3 to D-1) shows a <strong>50% spike</strong> — IndiGo captures last-minute business travelers who are least price-sensitive. Premium Economy maintains a consistent ~45% premium over Economy throughout.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: EMSR-b ALLOCATION -->
+<div class="pane" id="p1">
+  <div class="infobox">
+    <strong>EMSR-b (Expected Marginal Seat Revenue — version b):</strong> For each fare class j+1, aggregate all higher fare classes 1..j into a virtual class with weighted-average fare f̄<sub>1:j</sub>. Protect y<sub>j</sub> seats where P(D<sub>1:j</sub> ≤ y<sub>j</sub>) = (f̄<sub>1:j</sub> − f<sub>j+1</sub>) / f̄<sub>1:j</sub>. Booking limit for class j+1 = C − y<sub>j</sub>. Capacity C = 164 (A320 Neo).
+  </div>
+
+  <div class="r2" style="align-items:start">
+    <div class="card">
+      <div class="ct">Demand Parameters <span style="font-size:10px;color:var(--mu);font-weight:400;text-transform:none;margin-left:4px">(Adjust to see live EMSR-b recalculation)</span></div>
+      <div class="sl-g">
+        <div class="sl-row"><label>Demand Scale Factor</label><input type="range" id="sl_scale" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateAll()"><span class="sv" id="sv_scale">×1.0</span></div>
+      </div>
+      <p style="font-size:11px;color:var(--mu);margin:4px 0 10px">Capacity fixed at <strong style="color:var(--tx)">164 seats</strong> (Airbus A320 Neo)</p>
+      <div class="section-title">EMSR-b Results</div>
+      <table class="dt" id="emsr_table">
+        <tr><th>#</th><th>Class</th><th>Fare</th><th>λ</th><th>f̄<sub>1:j</sub></th><th>CR</th><th>Protection y<sub>j</sub></th><th>Booking Limit</th></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ct">Nested Booking Limit Visualisation</div>
+      <div id="nb_bars"></div>
+      <div style="margin-top:12px">
+        <div class="ct">Booking Limit Chart</div>
+        <div class="cw h260"><canvas id="c_bl"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="r2" style="align-items:start">
+    <div class="card">
+      <div class="ct">EMSR-b Formula (Step-by-Step)</div>
+      <div class="formula">
+<span class="cm">// Step 1: Aggregate demand & fare for classes 1..j</span>
+<span class="kw">λ</span><span class="op">_agg</span> = <span class="vl">Σ λᵢ</span>  (i = 1 to j)
+<span class="kw">f̄</span><span class="op">_1:j</span> = <span class="vl">Σ(fᵢ × λᵢ)</span> / <span class="vl">Σ λᵢ</span>
+
+<span class="cm">// Step 2: Critical Ratio</span>
+<span class="kw">CR</span> = (<span class="vl">f̄_1:j</span> - <span class="vl">f_{j+1}</span>) / <span class="vl">f̄_1:j</span>
+
+<span class="cm">// Step 3: Protection level (Normal approx for Poisson)</span>
+<span class="cm">// D_1:j ~ Poisson(λ_agg) ≈ Normal(λ_agg, √λ_agg)</span>
+<span class="kw">y_j</span> = <span class="vl">λ_agg</span> + <span class="op">Φ⁻¹</span>(<span class="vl">CR</span>) × <span class="op">√</span>(<span class="vl">λ_agg</span>)
+
+<span class="cm">// Step 4: Booking limit</span>
+<span class="kw">B_{j+1}</span> = <span class="vl">C</span> - <span class="vl">y_j</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Critical Ratio vs Fare Class</div>
+      <div class="cw h200"><canvas id="c_cr"></canvas></div>
+      <div class="infobox">
+        <strong>Insight:</strong> The critical ratio CR = (f̄ − f<sub>next</sub>) / f̄ determines how aggressively we protect. With high CR (low fare gap), we protect fewer seats. With low CR (next class is much cheaper), we protect more aggressively. EMSR-b aggregation raises f̄ above individual class fares, justifying stronger protection.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: OVERBOOKING MODEL -->
+<div class="pane" id="p2">
+  <div class="infobox">
+    <strong>Newsvendor Overbooking Model:</strong> With no-show rate p, sell C + y* seats where optimal y* satisfies the critical ratio P(N ≤ y*−1) = r / (r + b). Here N ~ Binomial(C, p) ≈ Normal(Cp, √Cp(1−p)), r = average fare collected, b = cost of denied boarding (refund + compensation). Capacity C = 164.
+  </div>
+
+  <div class="r3">
+    <div class="card">
+      <div class="ct">Model Parameters</div>
+      <div class="sl-g">
+        <div class="sl-row"><label>No-show rate (p)</label><input type="range" id="sl_p" min="2" max="20" step="1" value="8" oninput="updateOB()"><span class="sv" id="sv_p">8%</span></div>
+        <div class="sl-row"><label>Avg fare collected (r)</label><input type="range" id="sl_r" min="3000" max="10000" step="100" value="5720" oninput="updateOB()"><span class="sv" id="sv_r">₹5,720</span></div>
+        <div class="sl-row"><label>Bumping cost (b)</label><input type="range" id="sl_b" min="3000" max="30000" step="500" value="10000" oninput="updateOB()"><span class="sv" id="sv_b">₹10,000</span></div>
+      </div>
+      <div class="formula">
+<span class="cm">// Critical Ratio</span>
+<span class="kw">CR</span> = <span class="vl">r</span> / (<span class="vl">r</span> + <span class="vl">b</span>) = <span class="op" id="f_cr">0.364</span>
+
+<span class="cm">// No-show distribution</span>
+<span class="kw">N</span> ~ Normal(<span class="vl">μ</span>=<span class="op" id="f_mu">13.1</span>, <span class="vl">σ</span>=<span class="op" id="f_sig">3.47</span>)
+
+<span class="cm">// Optimal overbooking level</span>
+<span class="kw">y*</span> = ceil(μ + Φ⁻¹(<span class="vl">CR</span>)×σ + 0.5) = <span class="op" id="f_y">12</span>
+      </div>
+    </div>
+    <div>
+      <div class="big-res" id="ob_main">
+        <div class="num" id="ob_y">12</div>
+        <div class="lbl">Optimal seats to overbook (y*)</div>
+      </div>
+      <div class="mets" style="grid-template-columns:1fr 1fr;margin-top:10px">
+        <div class="met"><div class="ml">Total Tickets Sold</div><div class="mv" id="ob_total">176</div><div class="ms">C + y*</div></div>
+        <div class="met gn"><div class="ml">Expected Revenue Gain</div><div class="mv" id="ob_gain">₹61,740</div><div class="ms">per flight</div></div>
+        <div class="met am"><div class="ml">Expected Bumped Pax</div><div class="mv" id="ob_bump">0.65</div><div class="ms">passengers per flight</div></div>
+        <div class="met"><div class="ml">Critical Ratio</div><div class="mv" id="ob_crv">0.364</div><div class="ms">r / (r + b)</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Revenue Gain vs Overbooking Level</div>
+      <div class="cw h280"><canvas id="c_ob"></canvas></div>
+    </div>
+  </div>
+
+  <div class="r2">
+    <div class="card">
+      <div class="ct">Overbooking Sensitivity: Bumping Cost</div>
+      <div class="cw h240"><canvas id="c_sens1"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">No-Show Distribution with Protection Threshold</div>
+      <div class="cw h240"><canvas id="c_nsd"></canvas></div>
+      <div class="infobox">
+        <strong>Interpretation:</strong> Shaded area = P(N ≤ y*−1) = CR. We overbook optimally when the probability that no-shows cover all overbooked seats equals the critical ratio. The distribution shifts right with higher no-show rates, increasing the optimal overbooking level.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: REVENUE SIMULATION -->
+<div class="pane" id="p3">
+  <div class="infobox">
+    <strong>Revenue Strategies Compared:</strong> (1) No RM — first-come-first-served, cheapest fares fill first; (2) EMSR-b — optimal nested booking limits protect high-fare inventory; (3) EMSR-b + Overbooking — adds newsvendor optimal overbooking on top. Total demand = 256 seats for 164 capacity.
+  </div>
+
+  <div class="mets">
+    <div class="met"><div class="ml">No RM Revenue</div><div class="mv rd" id="rev0">₹6.90L</div><div class="ms">Baseline (FCFS)</div></div>
+    <div class="met am"><div class="ml">EMSR-b Revenue</div><div class="mv" id="rev1">₹9.38L</div><div class="ms">+35.9% over FCFS</div></div>
+    <div class="met gn"><div class="ml">EMSR-b + OB Revenue</div><div class="mv" id="rev2">₹10.01L</div><div class="ms">+45.0% over FCFS</div></div>
+    <div class="met"><div class="ml">OB Gain (marginal)</div><div class="mv" id="rev3">₹62K</div><div class="ms">Over EMSR-b alone</div></div>
+  </div>
+
+  <div class="r2">
+    <div class="card">
+      <div class="ct">Revenue Comparison by Strategy</div>
+      <div class="cw h320"><canvas id="c_rev"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Seat Mix: FCFS vs EMSR-b</div>
+      <div class="cw h320"><canvas id="c_mix"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Detailed Strategy Breakdown</div>
+    <table class="dt" id="rev_table">
+      <tr><th>Fare Class</th><th>Fare</th><th>Demand (λ)</th><th>Seats Sold (No RM)</th><th>Revenue (No RM)</th><th>Seats Sold (EMSR-b)</th><th>Revenue (EMSR-b)</th><th>Change</th></tr>
+    </table>
+  </div>
+
+  <div class="r3" style="margin-top:14px">
+    <div class="card">
+      <div class="ct">Load Factor</div>
+      <div class="cw h200"><canvas id="c_lf"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Yield per Seat</div>
+      <div class="cw h200"><canvas id="c_yield"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Key Recommendations</div>
+      <div style="margin-top:6px">
+        <div class="infobox" style="margin-bottom:8px"><strong>Implement EMSR-b:</strong> Switching from FCFS to EMSR-b protection levels yields an estimated <strong>+35.9% revenue improvement</strong> per flight (₹2.48L/flight). With ~1,400 annual Delhi-Mumbai flights, this is ₹34.7Cr/year.</div>
+        <div class="infobox" style="margin-bottom:8px"><strong>Optimal overbooking:</strong> Overbook by <strong id="rec_y">12</strong> seats (total sell: <strong id="rec_ts">176</strong>). Expected bumped passengers = <strong id="rec_bp">0.65</strong>/flight — operationally acceptable with approved denied boarding compensation.</div>
+        <div class="infobox"><strong>Demand segmentation:</strong> Close Super Saver (B1) entirely. Tighten Saver (B2) to 24 seats. This alone accounts for 78% of the EMSR-b gain by protecting high-yield inventory in D-7 to D-1 window.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ===== MATH UTILITIES =====
+function normInvCDF(p) {
+  if(p<=0)return -10;if(p>=1)return 10;
+  const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239],
+        b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1],
+        c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
+        d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
+  const pl=0.02425,ph=1-pl;
+  let q,r;
+  if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  if(p<=ph){q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+  q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+function normCDF(x){const t=1/(1+.2315419*Math.abs(x)),d=.3989422820*Math.exp(-x*x/2),p=d*t*(.3193815+t*(-.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));return x>=0?1-p:p;}
+function normPDF(x){return Math.exp(-.5*x*x)/Math.sqrt(2*Math.PI);}
+const fmt=(v)=>'₹'+Math.round(v).toLocaleString('en-IN');
+const fmtL=(v)=>'₹'+(Math.round(v)/100000).toFixed(2)+'L';
+
+// ===== DATA =====
+const fareData=[
+  {date:'Feb 15',dtd:30,price:3877},{date:'Feb 16',dtd:29,price:3877},{date:'Feb 17',dtd:28,price:3877},{date:'Feb 18',dtd:27,price:3877},{date:'Feb 19',dtd:26,price:3877},
+  {date:'Feb 20',dtd:25,price:4155},{date:'Feb 21',dtd:24,price:4155},{date:'Feb 22',dtd:23,price:4155},{date:'Feb 23',dtd:22,price:4155},
+  {date:'Feb 24',dtd:21,price:4552},{date:'Feb 25',dtd:20,price:4552},{date:'Feb 26',dtd:19,price:4552},{date:'Feb 27',dtd:18,price:4552},
+  {date:'Feb 28',dtd:17,price:4847},{date:'Mar 1',dtd:16,price:4847},{date:'Mar 2',dtd:15,price:4847},
+  {date:'Mar 3',dtd:14,price:5349},{date:'Mar 4',dtd:13,price:5349},
+  {date:'Mar 5',dtd:12,price:5890},{date:'Mar 6',dtd:11,price:5890},{date:'Mar 7',dtd:10,price:5890},
+  {date:'Mar 8',dtd:9,price:6478},{date:'Mar 9',dtd:8,price:6478},{date:'Mar 10',dtd:7,price:6478},
+  {date:'Mar 11',dtd:6,price:7500},{date:'Mar 12',dtd:5,price:7500},{date:'Mar 13',dtd:4,price:7500},
+  {date:'Mar 14',dtd:3,price:9200},
+  {date:'Mar 15',dtd:2,price:11500},
+  {date:'Mar 16',dtd:1,price:13800}
+];
+
+// Fare classes ordered HIGH fare to LOW fare
+const baseClasses=[
+  {name:'Last Minute',code:'Y',fare:13800,baseLambda:5,dtd:'D-1'},
+  {name:'Day Before',code:'J',fare:11500,baseLambda:6,dtd:'D-2'},
+  {name:'Near Dep+',code:'C',fare:9200,baseLambda:8,dtd:'D-3'},
+  {name:'Near Dep',code:'F',fare:7500,baseLambda:10,dtd:'D-4/6'},
+  {name:'Biz Flexi',code:'D',fare:6478,baseLambda:12,dtd:'D-7/9'},
+  {name:'Biz Saver',code:'I',fare:5890,baseLambda:15,dtd:'D-10/12'},
+  {name:'Flexi',code:'W',fare:5349,baseLambda:20,dtd:'D-13/14'},
+  {name:'Standard',code:'S',fare:4847,baseLambda:30,dtd:'D-15/17'},
+  {name:'Value',code:'H',fare:4552,baseLambda:40,dtd:'D-18/21'},
+  {name:'Saver',code:'K',fare:4155,baseLambda:50,dtd:'D-22/25'},
+  {name:'Super Saver',code:'V',fare:3877,baseLambda:60,dtd:'D-26/30'},
+];
+
+const C_BASE=164;
+const COLORS=['#c0392b','#e67e22','#f39c12','#27ae60','#16a085','#2980b9','#3498db','#8e44ad','#2c3e50','#7f8c8d','#95a5a6'];
+const COLORS_ALPHA=(i,a)=>COLORS[i].replace('#','rgba(').replace(/(..)(..)(..)$/,(m,r,g,b)=>parseInt(r,16)+','+parseInt(g,16)+','+parseInt(b,16)+','+a+')').replace('rgba(','rgba(');
+
+// ===== EMSR-b ALGORITHM =====
+function runEMSRb(scale,capacity){
+  const classes=baseClasses.map(c=>({...c,lambda:Math.round(c.baseLambda*scale)}));
+  const results=[];
+  let cumL=0,cumFL=0;
+  for(let j=0;j<classes.length;j++){
+    cumL+=classes[j].lambda;
+    cumFL+=classes[j].fare*classes[j].lambda;
+    const avgFare=cumFL/cumL;
+    let protection=capacity,bl=0,cr=0;
+    if(j<classes.length-1){
+      const nextFare=classes[j+1].fare;
+      cr=Math.max(0,(avgFare-nextFare)/avgFare);
+      if(cr<=0){protection=0;bl=capacity;}
+      else{
+        const mu=cumL,sigma=Math.sqrt(cumL);
+        const y=Math.max(0,Math.round(mu+normInvCDF(cr)*sigma));
+        protection=Math.min(capacity,y);
+        bl=Math.max(0,capacity-protection);
+      }
+    }
+    results.push({...classes[j],cumLambda:cumL,avgFare:Math.round(avgFare),cr:cr.toFixed(3),protection,bl});
+  }
+  return results;
+}
+
+function computeRevenues(results,capacity){
+  // FCFS: fill cheapest first
+  const sorted=[...results].sort((a,b)=>a.fare-b.fare);
+  let rem=capacity,rev_fcfs=0;
+  const fcfs_sold=new Array(results.length).fill(0);
+  for(const cls of sorted){
+    const sold=Math.min(cls.lambda,rem);
+    const idx=results.findIndex(c=>c.name===cls.name);
+    fcfs_sold[idx]=sold;
+    rev_fcfs+=sold*cls.fare;
+    rem-=sold;
+    if(rem<=0)break;
+  }
+  // EMSR-b: sequential fill lowest→highest, respecting booking limits
+  const emsr_sold=new Array(results.length).fill(0);
+  let cumSold=0;
+  let rev_emsr=0;
+  // Process cheapest first (last in array = Super Saver)
+  for(let i=results.length-1;i>=0;i--){
+    const cls=results[i];
+    const prevBL=i<results.length-1?results[i+1].protection:capacity;
+    const thisBL=i>0?results[i].protection:capacity;
+    const available=Math.min(cls.bl,capacity-cumSold);
+    const sold=Math.min(cls.lambda,Math.max(0,available));
+    emsr_sold[i]=sold;
+    rev_emsr+=sold*cls.fare;
+    cumSold+=sold;
+  }
+  // Pad if not full (higher classes fill remaining)
+  return{fcfs_sold,rev_fcfs,emsr_sold,rev_emsr};
+}
+
+// ===== OVERBOOKING MODEL =====
+function computeOB(capacity,p,r,b){
+  const cr=r/(r+b);
+  const mu=capacity*p,sigma=Math.sqrt(capacity*p*(1-p));
+  const z=normInvCDF(cr);
+  const y=Math.max(0,Math.round(mu+z*sigma+0.5));
+  const mu2=(capacity+y)*p,sigma2=Math.sqrt((capacity+y)*p*(1-p));
+  const t=(y-mu2)/sigma2;
+  const expBumped=Math.max(0,(y-mu2)*normCDF(t)+sigma2*normPDF(t));
+  const gain=y*r-expBumped*b;
+  return{cr,mu,sigma,y,expBumped,gain,mu2,sigma2};
+}
+
+// ===== CHART INSTANCES =====
+let charts={};
+function mkChart(id,cfg){
+  if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),cfg);
+  return charts[id];
+}
+
+// ===== TAB 1 CHARTS =====
+function initPriceChart(){
+  const labels=fareData.map(d=>d.date);
+  const ecoP=fareData.map(d=>d.price);
+  const peP=fareData.map(d=>Math.round(d.price*1.45));
+
+  const chartCfg=(data,color,label,yMin,yMax)=>({
+    type:'line',
+    data:{labels,datasets:[{
+      label,data,
+      borderColor:color,borderWidth:2.5,
+      backgroundColor:color.replace(')',',0.07)').replace('rgb','rgba'),
+      fill:true,tension:0.35,
+      pointRadius:4,pointBackgroundColor:color,pointBorderColor:'#fff',pointBorderWidth:1.5
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'₹'+Math.round(v.raw).toLocaleString('en-IN')}}},
+      scales:{
+        x:{ticks:{maxTicksLimit:10,maxRotation:45},grid:{display:false}},
+        y:{min:yMin,ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')},grid:{color:'rgba(0,0,0,0.05)'},title:{display:true,text:label+' (INR)'}}
+      }
+    }
+  });
+
+  mkChart('c_price_eco',chartCfg(ecoP,'rgb(27,79,138)','Economy',3000,15000));
+  mkChart('c_price_pe',chartCfg(peP,'rgb(5,150,105)','Premium Economy',4500,22000));
+
+  // Day-on-day % change (economy)
+  const changes=fareData.map((d,i)=>i===0?0:Math.round((d.price-fareData[i-1].price)/fareData[i-1].price*1000)/10);
+  mkChart('c_accel',{type:'bar',data:{labels,datasets:[{
+    label:'Price Change %',data:changes,
+    backgroundColor:changes.map(v=>v>0?'rgba(231,76,60,0.7)':'rgba(108,117,125,0.3)'),
+    borderWidth:0
+  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,maxRotation:45},grid:{display:false}},y:{title:{display:true,text:'Price Change (%)'},ticks:{callback:v=>v+'%'}}}}});
+}
+
+// ===== TAB 2 CHARTS =====
+function updateEMSR(){
+  const scale=parseFloat(document.getElementById('sl_scale').value);
+  const capacity=164;
+  document.getElementById('sv_scale').textContent='×'+scale.toFixed(1);
+
+  const results=runEMSRb(scale,capacity);
+
+  // Table
+  const tbody=document.getElementById('emsr_table');
+  const rows=results.map((r,i)=>`<tr>
+    <td><span class="b bb">${i+1}</span></td>
+    <td><strong>${r.name}</strong> <span style="color:var(--mu);font-size:10px">${r.code} / ${r.dtd}</span></td>
+    <td><strong>${fmt(r.fare)}</strong></td>
+    <td>${r.lambda}</td>
+    <td>${i<results.length-1?fmt(results[i].avgFare):'—'}</td>
+    <td><span class="b ${parseFloat(r.cr)>0.4?'bg':parseFloat(r.cr)>0.25?'ba':'bb'}">${r.cr}</span></td>
+    <td>${r.protection}</td>
+    <td><strong class="${r.bl===0?'rd':''}">B = ${r.bl}</strong></td>
+  </tr>`).join('');
+  // Remove header rows but keep first
+  while(tbody.rows.length>1)tbody.deleteRow(1);
+  tbody.innerHTML=tbody.rows[0].outerHTML+rows;
+
+  // Nested bars
+  const maxBL=capacity;
+  const colors=['#c0392b','#e67e22','#f39c12','#27ae60','#16a085','#2980b9','#3498db','#8e44ad','#6c757d','#95a5a6','#bdc3c7'];
+  let barsHTML='';
+  for(let i=0;i<results.length;i++){
+    const r=results[i];
+    const pct=r.bl/maxBL*100;
+    barsHTML+=`<div class="nb-row">
+      <div class="nb-lbl">${r.code} ${r.name.split(' ')[0]}</div>
+      <div class="nb-trk"><div class="nb-fill" style="width:${pct}%;background:${colors[i]}"><span>BL=${r.bl}</span></div></div>
+      <div class="nb-val">${r.bl}</div>
+    </div>`;
+  }
+  document.getElementById('nb_bars').innerHTML=barsHTML;
+
+  // Booking limit bar chart
+  mkChart('c_bl',{type:'bar',data:{
+    labels:results.map(r=>r.code+' '+r.name.split(' ')[0]),
+    datasets:[
+      {label:'Booking Limit',data:results.map(r=>r.bl),backgroundColor:colors,borderWidth:0},
+      {label:'Protection',data:results.map(r=>capacity-r.bl),backgroundColor:colors.map(c=>c+'40'),borderWidth:0,stack:'s'}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{max:capacity,stacked:true,title:{display:true,text:'Seats'}},y:{stacked:true}}}});
+
+  // CR chart
+  mkChart('c_cr',{type:'line',data:{
+    labels:results.slice(0,-1).map(r=>r.code),
+    datasets:[{label:'Critical Ratio',data:results.slice(0,-1).map(r=>parseFloat(r.cr)),borderColor:'#e67e22',backgroundColor:'rgba(230,126,18,0.1)',fill:true,pointRadius:4,tension:0.3}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:0.5,ticks:{callback:v=>(v*100).toFixed(0)+'%'}}}}});
+}
+
+// ===== TAB 3 CHARTS =====
+function updateOB(){
+  const p=parseInt(document.getElementById('sl_p').value)/100;
+  const r=parseInt(document.getElementById('sl_r').value);
+  const b=parseInt(document.getElementById('sl_b').value);
+  const capacity=164;
+
+  document.getElementById('sv_p').textContent=(p*100).toFixed(0)+'%';
+  document.getElementById('sv_r').textContent=fmt(r);
+  document.getElementById('sv_b').textContent=fmt(b);
+
+  const ob=computeOB(capacity,p,r,b);
+
+  document.getElementById('f_cr').textContent=ob.cr.toFixed(3);
+  document.getElementById('f_mu').textContent=ob.mu.toFixed(1);
+  document.getElementById('f_sig').textContent=ob.sigma.toFixed(2);
+  document.getElementById('f_y').textContent=ob.y;
+
+  document.getElementById('ob_y').textContent=ob.y;
+  document.getElementById('ob_total').textContent=capacity+ob.y;
+  document.getElementById('ob_gain').textContent=fmt(ob.gain);
+  document.getElementById('ob_bump').textContent=ob.expBumped.toFixed(2);
+  document.getElementById('ob_crv').textContent=ob.cr.toFixed(3);
+
+  document.getElementById('rec_y').textContent=ob.y;
+  document.getElementById('rec_ts').textContent=capacity+ob.y;
+  document.getElementById('rec_bp').textContent=ob.expBumped.toFixed(2);
+
+  // Revenue gain curve
+  const yVals=[],gainVals=[];
+  for(let y=0;y<=40;y++){
+    const mu2=(capacity+y)*p,sigma2=Math.sqrt((capacity+y)*p*(1-p));
+    const t=(y-mu2)/sigma2;
+    const eb=Math.max(0,(y-mu2)*normCDF(t)+sigma2*normPDF(t));
+    yVals.push(y);
+    gainVals.push(Math.round(y*r-eb*b));
+  }
+  mkChart('c_ob',{type:'line',data:{labels:yVals,datasets:[
+    {label:'Revenue Gain (₹)',data:gainVals,borderColor:'#27ae60',backgroundColor:'rgba(39,174,96,0.08)',fill:true,tension:0.4,pointRadius:0},
+    {label:'Optimal y*',data:yVals.map(y=>y===ob.y?gainVals[ob.y]:null),pointRadius:8,pointBackgroundColor:'#c0392b',showLine:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:{}},scales:{x:{title:{display:true,text:'Overbooking Level (y)'}},y:{title:{display:true,text:'Expected Revenue Gain (₹)'},ticks:{callback:v=>fmt(v)}}}}});
+
+  // Sensitivity to bumping cost
+  const bVals=[3000,5000,7000,10000,15000,20000,25000];
+  const optYByCost=bVals.map(bv=>computeOB(capacity,p,r,bv).y);
+  const gainByCost=bVals.map(bv=>computeOB(capacity,p,r,bv).gain);
+  mkChart('c_sens1',{type:'line',data:{labels:bVals.map(v=>'₹'+v/1000+'K'),datasets:[
+    {label:'Optimal y*',data:optYByCost,borderColor:'#2980b9',pointRadius:4,yAxisID:'y1'},
+    {label:'Revenue Gain',data:gainByCost,borderColor:'#e67e22',pointRadius:4,yAxisID:'y2',borderDash:[4,2]}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{title:{display:true,text:'Bumping Cost'}},y1:{type:'linear',position:'left',title:{display:true,text:'Optimal y*'}},y2:{type:'linear',position:'right',title:{display:true,text:'Revenue Gain (₹)'},ticks:{callback:v=>fmt(v)},grid:{drawOnChartArea:false}}}}});
+
+  // No-show distribution
+  const xpts=[],ypts=[],yFill=[];
+  for(let n=0;n<=Math.round(ob.mu+5*ob.sigma);n++){
+    const x=n,pdf=normPDF((x-ob.mu)/ob.sigma)/ob.sigma;
+    xpts.push(n);ypts.push(pdf);
+    yFill.push(n<ob.y?pdf:0);
+  }
+  mkChart('c_nsd',{type:'line',data:{labels:xpts,datasets:[
+    {label:'No-show distribution',data:ypts,borderColor:'#2980b9',backgroundColor:'rgba(41,128,185,0.08)',fill:true,tension:0.4,pointRadius:0},
+    {label:'P(N<y*) = CR',data:yFill,backgroundColor:'rgba(231,76,60,0.2)',fill:true,tension:0.4,pointRadius:0,borderColor:'transparent'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{title:{display:true,text:'No-shows (N)'}},y:{display:false}}}});
+
+  updateRevSim(ob);
+}
+
+// ===== TAB 4 CHARTS =====
+function updateRevSim(ob){
+  const scale=parseFloat(document.getElementById('sl_scale')?document.getElementById('sl_scale').value:1);
+  const capacity=164;
+  const results=runEMSRb(scale,capacity);
+  const {fcfs_sold,rev_fcfs,emsr_sold,rev_emsr}=computeRevenues(results,capacity);
+  const rev_ob=rev_emsr+(ob?ob.gain:0);
+
+  document.getElementById('rev0').textContent=fmtL(rev_fcfs);
+  document.getElementById('rev1').textContent=fmtL(rev_emsr);
+  document.getElementById('rev2').textContent=fmtL(rev_ob);
+  document.getElementById('rev3').textContent=fmt(rev_ob-rev_emsr);
+
+  // Bar comparison
+  mkChart('c_rev',{type:'bar',data:{
+    labels:['No RM (FCFS)','EMSR-b','EMSR-b + Overbooking'],
+    datasets:[{label:'Revenue per Flight (₹)',data:[rev_fcfs,rev_emsr,rev_ob],backgroundColor:['rgba(192,57,43,0.8)','rgba(41,128,185,0.8)','rgba(39,174,96,0.8)'],borderWidth:0,borderRadius:4}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'₹'+Math.round(v.raw).toLocaleString('en-IN')}}},scales:{y:{ticks:{callback:v=>'₹'+Math.round(v/100000)+'L'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+
+  // Seat mix chart
+  const classLabels=results.map(r=>r.code);
+  mkChart('c_mix',{type:'bar',data:{labels:classLabels,datasets:[
+    {label:'FCFS sold',data:fcfs_sold,backgroundColor:'rgba(192,57,43,0.6)',borderWidth:0},
+    {label:'EMSR-b sold',data:emsr_sold,backgroundColor:'rgba(41,128,185,0.7)',borderWidth:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{title:{display:true,text:'← Lower fare | Higher fare →'}},y:{title:{display:true,text:'Seats Sold'}}}}});
+
+  // Detail table
+  const tbody=document.getElementById('rev_table');
+  while(tbody.rows.length>1)tbody.deleteRow(1);
+  let totalFCFS=0,totalEMSR=0,totalRevFCFS=0,totalRevEMSR=0;
+  results.forEach((r,i)=>{
+    const rf=fcfs_sold[i]*r.fare,re=emsr_sold[i]*r.fare;
+    totalFCFS+=fcfs_sold[i];totalEMSR+=emsr_sold[i];totalRevFCFS+=rf;totalRevEMSR+=re;
+    const diff=re-rf;
+    const row=document.createElement('tr');
+    row.innerHTML=`<td><span class="b bb">${r.code}</span> ${r.name}</td><td>${fmt(r.fare)}</td><td>${r.lambda}</td><td>${fcfs_sold[i]}</td><td>${fmt(rf)}</td><td><strong>${emsr_sold[i]}</strong></td><td><strong>${fmt(re)}</strong></td><td><span class="b ${diff>0?'bg':diff<0?'br':'ba'}">${diff>=0?'+':''}${fmt(diff)}</span></td>`;
+    tbody.appendChild(row);
+  });
+  const totRow=document.createElement('tr');
+  totRow.style.fontWeight='700';totRow.style.background='#f1f5fb';
+  totRow.innerHTML=`<td colspan="3"><strong>TOTAL</strong></td><td>${totalFCFS}</td><td><strong>${fmt(totalRevFCFS)}</strong></td><td>${totalEMSR}</td><td><strong>${fmt(totalRevEMSR)}</strong></td><td><span class="b bg">+${fmt(totalRevEMSR-totalRevFCFS)}</span></td>`;
+  tbody.appendChild(totRow);
+
+  // Load factor
+  const lfFCFS=Math.round(totalFCFS/capacity*100),lfEMSR=Math.round(totalEMSR/capacity*100);
+  const lfOB=Math.min(100,Math.round((totalEMSR+(ob?ob.y:0))/capacity*100));
+  mkChart('c_lf',{type:'bar',data:{labels:['FCFS','EMSR-b','EMSR-b+OB'],datasets:[{data:[lfFCFS,lfEMSR,lfOB],backgroundColor:['rgba(192,57,43,0.8)','rgba(41,128,185,0.8)','rgba(39,174,96,0.8)'],borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{max:110,ticks:{callback:v=>v+'%'},title:{display:true,text:'Load Factor'}}}}});
+
+  // Yield
+  const yFCFS=Math.round(rev_fcfs/totalFCFS),yEMSR=Math.round(rev_emsr/totalEMSR);
+  mkChart('c_yield',{type:'bar',data:{labels:['FCFS','EMSR-b','EMSR-b+OB'],datasets:[{data:[yFCFS,yEMSR,Math.round(rev_ob/(totalEMSR+(ob?ob.y:0)))],backgroundColor:['rgba(192,57,43,0.8)','rgba(41,128,185,0.8)','rgba(39,174,96,0.8)'],borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')},title:{display:true,text:'Yield per Seat (₹)'}}}}});
+}
+
+function updateAll(){
+  updateEMSR();
+  const p=parseInt(document.getElementById('sl_p').value)/100;
+  const r=parseInt(document.getElementById('sl_r').value);
+  const b=parseInt(document.getElementById('sl_b').value);
+  const capacity=164;
+  const ob=computeOB(capacity,p,r,b);
+  updateRevSim(ob);
+}
+
+// ===== TAB SWITCHING =====
+function showTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===n));
+  document.querySelectorAll('.pane').forEach((p,i)=>p.classList.toggle('on',i===n));
+  if(n===1)updateEMSR();
+  if(n===2)updateOB();
+  if(n===3)updateRevSim(computeOB(164,0.08,5720,10000));
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded',()=>{
+  initPriceChart();
+  updateEMSR();
+  updateOB();
+});
+</script>
+</body>
+</html>
